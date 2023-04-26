@@ -232,6 +232,7 @@ MediaBrowser = function(cssSelector, json, title, enable_breadcrumbs, options){
     $(cssSelector).on('click', '.list-dir', listdirclick);
     $(cssSelector).on('click', '.compact-list-dir', listdirclick);
     $(cssSelector).on('click', '.musicfile', MediaBrowser.static.addThisTrackToPlaylist);
+    $(cssSelector).on('dblclick', '.musicfile', MediaBrowser.static.playThisTrackNext);
     $(cssSelector).on('click', '.cm-media-list-wrench', function(){
         var dirname = decodeURIComponent($(this).attr('data-dirname'));
         $('#changeAlbumArt').attr('data-dirname', $(this).attr('data-dirname'));
@@ -339,6 +340,14 @@ MediaBrowser.static = {
             filterUPPER: json.label.toUpperCase(),
         };
         return Mustache.render(template, template_data);
+    },
+
+    //Immediately Skips current song and plays selected song immediately
+    playThisTrackNext : function(){
+        "use strict"
+        playlistManager.skipQueue( $(this).attr("path"), $(this).attr("title") );
+        $(this).blur();
+        return false;
     },
 
     addThisTrackToPlaylist : function(){
