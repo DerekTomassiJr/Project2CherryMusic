@@ -128,6 +128,8 @@ function errorFunc(msg){
         displayNotification(msg,'error');
     };
 }
+
+//Function used to Display message for music library update
 function successNotify(msg){
     return function(){
         displayNotification(msg,'success');
@@ -468,6 +470,9 @@ function ord(c)
 function showPlaylists(sortby, filterby){
     "use strict";
     var success = function(data){
+
+        successNotify('Password changed successfully!');
+
         var addressAndPort = getAddrPort();
         var value_before = $('.playlist-filter-input').val();
         new MediaBrowser('.search-results', data, 'Playlist browser', false, {showPlaylistPanel: true});
@@ -843,13 +848,17 @@ function loadBrowser(directory, title){
         title = 'Root';
     }
     var success = function(data){
+
         new MediaBrowser('.search-results', data, title);
+
     };
     busy('#searchfield').hide().fadeIn('fast');
     api('listdir',
         {'directory' : directory},
         success,
-        errorFunc('failed to load file browser'),
+        errorFunc('testing'),
+        successNotify('Music Updated Successfully'),
+
         function(){busy('#searchfield').fadeOut('fast')});
 }
 
