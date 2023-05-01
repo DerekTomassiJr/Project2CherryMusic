@@ -37,17 +37,32 @@ import threading
 
 from cherrymusicserver import pathprovider
 from cherrymusicserver import configuration as cfg
+from cherrymusicserver.util import validateMusicLocation # Yuriy added this function to make setup safe
 
 
 class SetupHandler:
     def index(self):
+        print("WHAT")
+        print("userdatapath")
+        # return "TEST"
         return pathprovider.readRes('res/setup.html')
     index.exposed = True
+
+    def test(self):
+        return pathprovider.readRes('res/setup.html')
+ 
 
     def saveconfig(self, values):
         collect_errors = cfg.error_collector()
         baseconfig = cfg.from_defaults()
         newconfig = json.loads(values)
+        print(newconfig)
+
+        validatedLocation = validateMusicLocation(newconfig["media.basedir"])
+        if validatedLocation == "":
+            return json.dumps({"status": "error_failed_to_validate"})
+
+        newconfig["media.basedir"] = validatedLocation
         customcfg = baseconfig.replace(newconfig, collect_errors)
         if collect_errors:
             badkeys = (e.key for e in collect_errors)
@@ -134,6 +149,7 @@ def configureAndStartCherryPy(port):
         socket_host = "0.0.0.0"
         resourcedir = os.path.abspath(pathprovider.getResourcePath('res'))
         userdatapath = pathprovider.getUserDataPath()
+
         cherrypy.config.update({
             'server.socket_port': port,
             'log.error_file': os.path.join(userdatapath, 'server.log'),

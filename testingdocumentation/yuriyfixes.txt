@@ -1,0 +1,1 @@
+- Fixing listdir to tolerate illegal characters at the end of the dir

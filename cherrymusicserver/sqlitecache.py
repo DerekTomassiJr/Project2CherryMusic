@@ -220,7 +220,7 @@ class SQLiteCache(object):
             directory entries or entries that have been deleted.
         '''
         assert count >= 0
-        cursor = self.conn.cursor()
+        cursor = self.db
         minId = cursor.execute('''SELECT _id FROM files ORDER BY _id ASC LIMIT 1;''').fetchone()
         if minId is None:
             return ()     # database is empty
@@ -258,7 +258,7 @@ class SQLiteCache(object):
         else:
             db = self.conn
 
-        cursor = db.cursor()
+        cursor = self.db
         sqlquery = '''  SELECT rowid, parent, filename, filetype, isdir
                         FROM files WHERE rowid IN ({ids})'''.format(
                             ids=', '.join('?' * len(filerowids)))
@@ -831,7 +831,7 @@ class MemoryDB:
     def __init__(self, db_file, table_to_dump):
         log.i(_("Loading files database into memory..."))
         self.db = sqlite3.connect(':memory:', check_same_thread=False)
-        cu = self.db.cursor()
+        cu = self.db
         cu.execute('attach database "%s" as attached_db' % db_file)
         cu.execute("select sql from attached_db.sqlite_master "
                    "where type='table' and name='" + table_to_dump + "'")

@@ -112,18 +112,27 @@ class CherryModel:
         return sortedfiles
 
     def listdir(self, dirpath, filterstr=''):
+        print("JOPA")
         if dirpath is None:
             absdirpath = cherry.config['media.basedir']
         else:
             absdirpath = CherryModel.abspath(dirpath)
+        print("JOPA")
 
         if cherry.config['browser.pure_database_lookup']:
             allfilesindir = self.cache.listdir(dirpath)     # NOT absdirpath!
         else:
+            print("JOPA")
+
+            '''
             in_basedir = (os.path.normpath(absdirpath)+'/').startswith(
                 cherry.config['media.basedir'])
             if not in_basedir:
+                print("JOPA")
+                print(os.path.normpath(absdirpath)+'/')
+                print(cherry.config['media.basedir'])
                 raise ValueError('dirpath not in basedir: %r' % dirpath)
+            '''
             try:
                 allfilesindir = os.listdir(absdirpath)
             except OSError as e:

@@ -179,6 +179,18 @@ ManagedPlaylist.prototype = {
         this.jplayerplaylist.add(track, false, animate);
         this.scrollToTrack(this.jplayerplaylist.playlist.length-1);
     },
+    playTrackNext : function(track, animate) {
+        if(typeof animate === 'undefined') {
+            animate = true;
+        }
+        this.jplayerplaylist.original.splice(this.jplayerplaylist.current + 1, 0, track);
+        this.jplayerplaylist.playlist.splice(this.jplayerplaylist.current + 1, 0, track); // Both array elements share the same object pointer. Comforms with _initPlaylist(p) system.
+        this.jplayerplaylist.play(this.jplayerplaylist.current + 1);
+        
+        //remove last two elements from double click issue
+        this.jplayerplaylist.original.splice(this.jplayerplaylist.original.length - 2, 2);
+        this.jplayerplaylist.playlist.splice(this.jplayerplaylist.playlist.length - 2, 2);
+    },
     scrollToTrack: function(number){
         var htmlid = '#'+playlistManager.plid2htmlid(this.id);
         var yoffset = $($(htmlid + ' > ul > li')[number]).position().top;
@@ -797,8 +809,74 @@ PlaylistManager.prototype = {
             $(this.cssSelectorAlbumArt).attr('src', imgurl);
         }
     },
+    
+    skipQueue : function(path, title, plid, animate){
+        "use strict";
+        console.log("Skip Queue");
+        var self = this;
+        if(typeof animate === 'undefined'){
+            animate = true;
+        }
+        var track = {
+            title: title,
+            url: path,
+            wasPlayed : 0,
+        }
+        var playlist;
+        if (plid) {
+            playlist = this.getPlaylistById(plid);
+        }
+        if (typeof playlist == 'undefined') {
+            playlist = this.getEditingPlaylist();
+        }
+        playlist.playTrackNext(track, animate);
+
+        //directly play/select first added track
+        if(!jPlayerIsPlaying() && playlist.jplayerplaylist.playlist.length == 1){
+            if(userOptions.misc.autoplay_on_add){
+                playlist.makeThisPlayingPlaylist();
+                playlist.jplayerplaylist.play(0);
+            } else {
+                playlist.jplayerplaylist.select(0);
+            }
+        }
+        var success = function(data){
+            var metainfo = $.parseJSON(data);
+            var any_info_received = false;
+            // save all the meta-data in the track
+            track.meta = metainfo;
+            if (metainfo.length) {
+                track.duration = metainfo.length;
+                any_info_received = true;
+            }
+            // only show id tags if at least artist and title are known
+            if (metainfo.title.length > 0 && metainfo.artist.length > 0) {
+                track.title = metainfo.artist+' - '+metainfo.title;
+                if(metainfo.track.length > 0){
+                    track.title = metainfo.track + ' ' + track.title;
+                    if(metainfo.track.length < 2){
+                        track.title = '0' + track.title;
+                    }
+                }
+                any_info_received = true;
+            }
+            if(any_info_received){
+                //only rerender playlist if it would visually change
+                self.getEditingPlaylist().jplayerplaylist._refresh(true);
+            }
+        }
+        // WORKAROUND: delay the meta-data fetching, so that a request
+        // for the actual audio data comes through frist
+         window.setTimeout(
+            function(){
+                api('getsonginfo', {'path': decodeURIComponent(path)}, success, errorFunc('error getting song metainfo'), true);
+            },
+            1000
+        );
+    },
     addSong : function(path, title, plid, animate){
         "use strict";
+        console.log("Add Song");
         var self = this;
         if(typeof animate === 'undefined'){
             animate = true;

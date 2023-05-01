@@ -55,7 +55,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 import gettext
-import gettext as _
 from cherrymusicserver import pathprovider
 
 
@@ -472,6 +471,7 @@ If you are sure that cherrymusic is not running, you can delete this file and re
                 # see patch to cherrypy.lib.static.serve_file way above and
                 # https://bitbucket.org/cherrypy/cherrypy/issue/1148/wrong-encoding-for-urls-containing-utf-8
                 basedirpath = codecs.decode(codecs.encode(basedirpath, 'utf-8'), 'latin-1')
+
             scriptname = config['server.rootpath']
         cherrypy.tree.mount(
             httphandler, scriptname,

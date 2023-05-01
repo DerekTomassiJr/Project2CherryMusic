@@ -53,6 +53,17 @@ def timed(func):
     return wrapper
 
 
+def validateMusicLocation(location):
+    location = location.replace("//", "/")
+    location = location.replace("\\", "/")
+    if not os.path.exists(location):
+        try:
+            os.mkdir(location)
+            return location
+        except OSError as exc:
+            return ""
+    return location
+
 def trim_to_maxlen(maxlen, s, insert=' ... '):
     '''no sanity check for maxlen and len(insert)'''
     if len(s) > maxlen:
