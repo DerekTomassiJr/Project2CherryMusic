@@ -322,6 +322,13 @@ def create_default_config_file(path):
     log.i(_('Default configuration file written to %(path)r'), {'path': path})
 
 
+def delete_previous_process():
+    # removes existing pid file from previous process
+    if pathprovider.pidFileExists():
+        if sys.platform.startswith('win'):
+            CherryMusic.delete_pid_file()
+
+
 class CherryMusic:
     """Sets up services (configuration, database, etc) and starts the server"""
     def __init__(self, cfg_override=None):
@@ -339,6 +346,8 @@ class CherryMusic:
         if os.name == 'posix':
             signal.signal(signal.SIGHUP, CherryMusic.stopAndCleanUp)
 
+        delete_previous_process()
+        
         CherryMusic.create_pid_file()
         self.start_server(httphandler.HTTPHandler(config))
         CherryMusic.delete_pid_file()

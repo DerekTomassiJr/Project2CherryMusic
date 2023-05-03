@@ -62,7 +62,10 @@ from cherrymusicserver import log
 NUMBERS = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
 
 
+
+
 def filter_hidden_files(file):
+
     if file.startswith('.') and not file[1].isalpha():
         return False
     else:

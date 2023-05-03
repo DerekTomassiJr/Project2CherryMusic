@@ -35,6 +35,8 @@ import os
 from mock import *
 from nose.tools import *
 
+
+
 from cherrymusicserver.test.helpers import cherrytest, tempdir, mkpath, cherryconfig, symlinktest
 
 from cherrymusicserver import log
@@ -43,11 +45,15 @@ log.setTest()
 from cherrymusicserver import cherrymodel
 from cherrymusicserver import sqlitecache
 
+
+
 def config(cfg=None):
     c = {'media.basedir': os.path.join(os.path.dirname(__file__), 'data_files')}
     if cfg:
         c.update(cfg)
     return c
+
+
 
 
 @cherrytest(config({'browser.pure_database_lookup': False}))
