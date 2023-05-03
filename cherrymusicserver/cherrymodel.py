@@ -61,6 +61,14 @@ from cherrymusicserver import log
 # used for sorting
 NUMBERS = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
 
+
+def filter_hidden_files(file):
+    if file.startswith('.') and not file[1].isalpha():
+        return False
+    else:
+        return True
+
+
 @service.user(cache='filecache')
 class CherryModel:
     def __init__(self):
@@ -136,7 +144,7 @@ class CherryModel:
             allfilesindir = [f for f in allfilesindir
                              if f.lower().startswith(filterstr)]
         else:
-            allfilesindir = [f for f in allfilesindir if not f.startswith('.')]
+            allfilesindir = [f for f in allfilesindir if not filter_hidden_files(f)]
 
         musicentries = []
 
@@ -310,7 +318,7 @@ class CherryModel:
     def isValidMediaEntry(cls, file):
         " only existing directories and playable files are valid"
         file.path = strippath(file.path)
-        if file.path.startswith('.'):
+        if filter_hidden_files(file.path):
             return False
         abspath = CherryModel.abspath(file.path)
         if file.dir:

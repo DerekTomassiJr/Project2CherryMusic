@@ -849,14 +849,18 @@ function loadBrowser(directory, title){
     }
     var success = function(data){
 
-        new MediaBrowser('.search-results', data, title);
+
+        new MediaBrowser('.search-results', data, title );
 
     };
     busy('#searchfield').hide().fadeIn('fast');
     api('listdir',
         {'directory' : directory},
+
         success,
-        errorFunc('testing'),
+
+        errorFunc('Could not Update Music Successfully'),
+
         successNotify('Music Updated Successfully'),
 
         function(){busy('#searchfield').fadeOut('fast')});
