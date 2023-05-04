@@ -147,7 +147,7 @@ class CherryModel:
             allfilesindir = [f for f in allfilesindir
                              if f.lower().startswith(filterstr)]
         else:
-            allfilesindir = [f for f in allfilesindir if not filter_hidden_files(f)]
+            allfilesindir = [f for f in allfilesindir if filter_hidden_files(f)]
 
         musicentries = []
 
