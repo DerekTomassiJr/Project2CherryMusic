@@ -339,6 +339,11 @@ class CherryMusic:
         if os.name == 'posix':
             signal.signal(signal.SIGHUP, CherryMusic.stopAndCleanUp)
 
+        # removes existing pid file from previous process
+        if pathprovider.pidFileExists():
+            if sys.platform.startswith('win'):
+                CherryMusic.delete_pid_file()
+                
         CherryMusic.create_pid_file()
         self.start_server(httphandler.HTTPHandler(config))
         CherryMusic.delete_pid_file()
