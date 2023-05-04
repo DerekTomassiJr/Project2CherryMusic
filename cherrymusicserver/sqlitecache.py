@@ -256,9 +256,9 @@ class SQLiteCache(object):
         if self.file_db_in_memory():
             db = self.file_db_mem.db
         else:
-            db = self.conn
+            db = self.db
 
-        cursor = self.db
+        cursor = db
         sqlquery = '''  SELECT rowid, parent, filename, filetype, isdir
                         FROM files WHERE rowid IN ({ids})'''.format(
                             ids=', '.join('?' * len(filerowids)))
@@ -361,7 +361,7 @@ class SQLiteCache(object):
 
         deld = 0
         try:
-            with self.conn:
+            with self.db:
                 for item in self.db_recursive_filelister(fileobj, factory):
                     remove(item)
                     deld += 1

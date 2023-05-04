@@ -68,6 +68,10 @@ class TestAuthenticate(unittest.TestCase):
                          'authentication must return authenticated user')
 
 
+    def testDATABASEPOINTERS():
+        testNoLoginWithWrongPassword()
+        testRegisteredUserCanLogin()
+
     def testNoLoginWithWrongPassword(self):
         '''valid username and invalid password = authentication failure'''
 
