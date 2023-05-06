@@ -62,10 +62,7 @@ from cherrymusicserver import log
 NUMBERS = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
 
 
-
-
 def filter_hidden_files(file):
-
     if file.startswith('.') and not file[1].isalpha():
         return False
     else:
@@ -106,7 +103,7 @@ class CherryModel:
                     non_number_index += 1
             # make sure that numbers are sorted correctly by evening out
             # the number in the filename 0-padding up to 5 digits.
-            return '0'*(5 - non_number_index) + upper
+            return '0' * (5 - non_number_index) + upper
         return upper
 
     def sortFiles(self, files, fullpath='', number_ordering=False):
@@ -117,7 +114,7 @@ class CherryModel:
         else:
             sortedfiles = sorted(files, key=CherryModel.fileSortFunc)
         if fullpath:
-            #sort directories up
+            # sort directories up
             isfile = lambda x: os.path.isfile(os.path.join(fullpath, x))
             sortedfiles = sorted(sortedfiles, key=isfile)
         return sortedfiles
@@ -129,9 +126,9 @@ class CherryModel:
             absdirpath = CherryModel.abspath(dirpath)
 
         if cherry.config['browser.pure_database_lookup']:
-            allfilesindir = self.cache.listdir(dirpath)     # NOT absdirpath!
+            allfilesindir = self.cache.listdir(dirpath)  # NOT absdirpath!
         else:
-            in_basedir = (os.path.normpath(absdirpath)+'/').startswith(
+            in_basedir = (os.path.normpath(absdirpath) + '/').startswith(
                 cherry.config['media.basedir'])
             if not in_basedir:
                 raise ValueError('dirpath not in basedir: %r' % dirpath)
@@ -141,13 +138,13 @@ class CherryModel:
                 log.e(_('Error listing directory %s: %s') % (absdirpath, str(e)))
                 allfilesindir = []
 
-        #remove all files not inside the filter
+        # remove all files not inside the filter
         if filterstr:
             filterstr = filterstr.lower()
             allfilesindir = [f for f in allfilesindir
                              if f.lower().startswith(filterstr)]
         else:
-            allfilesindir = [f for f in allfilesindir if not filter_hidden_files(f)]
+            allfilesindir = [f for f in allfilesindir if filter_hidden_files(f)]
 
         musicentries = []
 
@@ -156,7 +153,7 @@ class CherryModel:
         if compactlisting:
             upper_case_files = [x.upper() for x in allfilesindir]
             filterstr = os.path.commonprefix(upper_case_files)
-            filterlength = len(filterstr)+1
+            filterlength = len(filterstr) + 1
             currentletter = '/'  # impossible first character
             # don't care about natural number order in compact listing
             sortedfiles = self.sortFiles(allfilesindir, number_ordering=False)
@@ -166,7 +163,7 @@ class CherryModel:
                     continue
                 else:
                     currentletter = dir[:filterlength]
-                    #if the filter equals the foldername
+                    # if the filter equals the foldername
                     if len(currentletter) == len(filterstr):
                         subpath = os.path.join(absdirpath, dir)
                         CherryModel.addMusicEntry(subpath, musicentries)
@@ -246,6 +243,7 @@ class CherryModel:
         except Exception as e:
             log.e(_('Error fetching version info: %s') % str(e))
             return []
+
     def motd(self):
         artist = ['Hendrix',
                   'Miles Davis',
@@ -312,7 +310,7 @@ class CherryModel:
         return oneliner
 
     def randomMusicEntries(self, count):
-        loadCount = int(count * 1.5) + 1           # expect 70% valid entries
+        loadCount = int(count * 1.5) + 1  # expect 70% valid entries
         entries = self.cache.randomFileEntries(loadCount)
         filteredEntries = list(filter(CherryModel.isValidMediaEntry, entries))
         return filteredEntries[:count]
@@ -339,6 +337,7 @@ class CherryModel:
         is_supported_ext = ext and ext.lower() in CherryModel.supportedFormats
         is_nonempty_file = os.path.isfile(path) and bool(os.path.getsize(path))
         return is_supported_ext and is_nonempty_file
+
 
 def strippath(path):
     if path.startswith(cherry.config['media.basedir']):
@@ -382,9 +381,9 @@ class MusicEntry:
             for idx, filename in enumerate(directory_listing):
                 if idx > MusicEntry.MAX_SUB_FILES_ITER_COUNT:
                     # estimate remaining file count
-                    self.subfilescount *= len(directory_listing)/float(idx+1)
+                    self.subfilescount *= len(directory_listing) / float(idx + 1)
                     self.subfilescount = int(self.subfilescount)
-                    self.subdircount *= len(directory_listing)/float(idx+1)
+                    self.subdircount *= len(directory_listing) / float(idx + 1)
                     self.subdircount = int(self.subdircount)
                     self.subfilesestimate = True
                     return
@@ -397,21 +396,21 @@ class MusicEntry:
 
     def to_dict(self):
         if self.compact:
-            #compact
+            # compact
             return {'type': 'compact',
                     'urlpath': self.path,
                     'label': self.repr}
         elif self.dir:
-            #dir
+            # dir
             simplename = pathprovider.filename(self.path)
             return {'type': 'dir',
                     'path': self.path,
                     'label': simplename,
                     'foldercount': self.subdircount,
                     'filescount': self.subfilescount,
-                    'filescountestimate': self.subfilesestimate }
+                    'filescountestimate': self.subfilesestimate}
         else:
-            #file
+            # file
             simplename = pathprovider.filename(self.path)
             urlpath = quote(self.path.encode('utf8'))
             return {'type': 'file',
